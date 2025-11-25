@@ -1,12 +1,23 @@
-FROM justb4/jmeter:5.4.1
+# Dockerfile for ARM (aarch64) JMeter image
+FROM arm64v8/openjdk:11-jre-slim
 
-WORKDIR /tests
+# Set JMeter version and environment variables
+ENV JMETER_VERSION=5.4.1
+ENV JMETER_HOME=/opt/apache-jmeter-${JMETER_VERSION}
+ENV PATH=${JMETER_HOME}/bin:$PATH
 
-# Copy the FastAPI load-test plan into the image so it is available at runtime
-COPY fastapi_test_plan.jmx /tests/fastapi_test_plan.jmx
+# Install required packages (wget, unzip)
+RUN apt-get update && \
+    apt-get install -y wget unzip && \
+    rm -rf /var/lib/apt/lists/*
 
-# Override upstream entrypoint so Jenkins can set the exact command
-ENTRYPOINT [""]
+# Download and extract Apache JMeter
+RUN wget https://archive.apache.org/dist/jmeter/binaries/apache-jmeter-${JMETER_VERSION}.tgz && \
+    tar -xzf apache-jmeter-${JMETER_VERSION}.tgz -C /opt/ && \
+    rm apache-jmeter-${JMETER_VERSION}.tgz
 
-# Provide a sensible default; Jenkins overrides this via the stage command
-CMD ["-n", "-t", "/tests/fastapi_test_plan.jmx", "-l", "/tests/results.jtl"]
+# Set the working directory
+WORKDIR ${JMETER_HOME}
+
+# Default command: run JMeter in non-GUI mode
+CMD ["jmeter", "-n"]
