@@ -1,4 +1,4 @@
-FROM arm64v8/eclipse-temurin:11-jre
+FROM eclipse-temurin:11-jre
 
 ENV JMETER_VERSION=5.4.1
 ENV JMETER_HOME=/opt/apache-jmeter-${JMETER_VERSION}
