@@ -16,7 +16,6 @@ services:
       context: ./jmeter
       dockerfile: Dockerfile
     container_name: jmeter
-    working_dir: /jmeter
     volumes:
       - ./jmeter:/jmeter
     command:
@@ -31,8 +30,6 @@ services:
       - -e
       - -o
       - /jmeter/report
-    depends_on:
-      - fastapi-app
     networks:
       - loadtest-net
 
@@ -70,8 +67,6 @@ services:
       - GF_SECURITY_ADMIN_PASSWORD=admin
     volumes:
       - grafana-data:/var/lib/grafana
-    depends_on:
-      - prometheus
     networks:
       - loadtest-net
 
