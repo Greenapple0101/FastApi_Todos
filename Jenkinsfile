@@ -89,7 +89,7 @@ pipeline {
                                 mkdir -p report
                                 jmeter -n \
                                        -t fastapi_test_plan.jmx \
-                                       -JBASE_URL=http://localhost:5001 \
+                                       -JBASE_URL=http://3.34.155.126:5001 \
                                        -l results.jtl \
                                        -Jjmeter.save.saveservice.output_format=csv \
                                        -e -o report
