@@ -1,4 +1,5 @@
-FROM dacer/jmeter:latest
+FROM ghcr.io/apache/jmeter:5.6.3
+
 
 WORKDIR /tests
 
