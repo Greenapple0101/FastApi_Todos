@@ -69,6 +69,40 @@ pipeline {
             }
         }
 
+        stage('Build') {
+            steps {
+                dir('fastapi-app') {
+                    script {
+                        docker.build("${IMAGE_NAME}:latest", ".")
+                    }
+                }
+            }
+        }
+
+        stage('Push') {
+            steps {
+                script {
+                    docker.withRegistry('https://index.docker.io/v1/', DOCKERHUB_CREDENTIALS) {
+                        docker.image("${IMAGE_NAME}:latest").push()
+                    }
+                }
+            }
+        }
+
+        stage('Deploy') {
+            steps {
+                sshagent(['ubuntu']) {
+                    sh """
+                        ssh -o StrictHostKeyChecking=no ubuntu@3.34.155.126 '
+                            docker pull yorange50/fastapi-app:latest &&
+                            docker rm -f FastApi-app || true &&
+                            docker run -d --name FastApi-app -p 5001:5001 yorange50/fastapi-app:latest
+                        '
+                    """
+                }
+            }
+        }
+
         stage('Build JMeter Image') {
             steps {
                 dir('jmeter') {
@@ -108,40 +142,6 @@ pipeline {
                         alwaysLinkToLastBuild: true,
                         allowMissing         : false
                     ])
-                }
-            }
-        }
-
-        stage('Build') {
-            steps {
-                dir('fastapi-app') {
-                    script {
-                        docker.build("${IMAGE_NAME}:latest", ".")
-                    }
-                }
-            }
-        }
-
-        stage('Push') {
-            steps {
-                script {
-                    docker.withRegistry('https://index.docker.io/v1/', DOCKERHUB_CREDENTIALS) {
-                        docker.image("${IMAGE_NAME}:latest").push()
-                    }
-                }
-            }
-        }
-
-        stage('Deploy') {
-            steps {
-                sshagent(['ubuntu']) {
-                    sh """
-                        ssh -o StrictHostKeyChecking=no ubuntu@3.34.155.126 '
-                            docker pull yorange50/fastapi-app:latest &&
-                            docker rm -f FastApi-app || true &&
-                            docker run -d --name FastApi-app -p 5001:5001 yorange50/fastapi-app:latest
-                        '
-                    """
                 }
             }
         }
