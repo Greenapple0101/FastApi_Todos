@@ -1,4 +1,4 @@
-FROM loadimpact/jmeter:5.6.3
+FROM ghcr.io/apache/jmeter:5.6.3
 
 
 ENTRYPOINT [""]
