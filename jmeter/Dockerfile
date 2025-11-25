@@ -1,4 +1,4 @@
-FROM openjdk:11-jre-slim
+FROM eclipse-temurin:11-jre-jammy
 
 ENV JMETER_VERSION=5.4.1
 ENV JMETER_HOME=/opt/apache-jmeter-${JMETER_VERSION}
@@ -14,8 +14,4 @@ RUN wget https://archive.apache.org/dist/jmeter/binaries/apache-jmeter-${JMETER_
 
 WORKDIR ${JMETER_HOME}
 
-# Provide the project-specific test plan inside the image
-COPY fastapi_test_plan.jmx ${JMETER_HOME}/fastapi_test_plan.jmx
-
-# Default entrypoint runs JMeter; Jenkins overrides arguments as needed
 ENTRYPOINT ["jmeter"]
