@@ -16,7 +16,7 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git url:  'https://github.com/Greenapple0101/FASTAPI-APP.git', branch: 'main'
+                git url:  'https://github.com/Greenapple0101/FastApi_Todos.git', branch: 'main'
             }
         }
 
