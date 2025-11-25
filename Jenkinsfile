@@ -96,7 +96,18 @@ pipeline {
                         ssh -o StrictHostKeyChecking=no ubuntu@3.34.155.126 '
                             docker pull yorange50/fastapi-app:latest &&
                             docker rm -f FastApi-app || true &&
-                            docker run -d --name FastApi-app -p 5001:5001 yorange50/fastapi-app:latest
+                            docker run -d --name FastApi-app -p 5001:5001 yorange50/fastapi-app:latest &&
+                            echo "Waiting for FastAPI to be ready..." &&
+                            for i in {1..30}; do
+                                if curl -f http://localhost:5001/health > /dev/null 2>&1; then
+                                    echo "FastAPI is ready!"
+                                    exit 0
+                                fi
+                                echo "Attempt \$i/30: FastAPI not ready yet, waiting 2 seconds..."
+                                sleep 2
+                            done &&
+                            echo "FastAPI health check timeout" &&
+                            exit 1
                         '
                     """
                 }
@@ -121,12 +132,29 @@ pipeline {
                             sh '''
                                 rm -rf report jmeter.log results.jtl
                                 mkdir -p report
+                                
+                                # Verify FastAPI is accessible before running tests
+                                echo "Checking FastAPI availability..."
+                                if ! curl -f http://3.34.155.126:5001/health > /dev/null 2>&1; then
+                                    echo "ERROR: FastAPI is not accessible at http://3.34.155.126:5001"
+                                    exit 1
+                                fi
+                                echo "FastAPI is accessible, starting JMeter tests..."
+                                
                                 jmeter -n \
                                        -t fastapi_test_plan.jmx \
                                        -JBASE_URL=http://3.34.155.126:5001 \
                                        -l results.jtl \
                                        -Jjmeter.save.saveservice.output_format=csv \
                                        -e -o report
+                                
+                                # Check if results file was created and has content
+                                if [ ! -f results.jtl ] || [ ! -s results.jtl ]; then
+                                    echo "ERROR: results.jtl file is missing or empty"
+                                    exit 1
+                                fi
+                                
+                                echo "JMeter test completed. Results file size: $(wc -l < results.jtl) lines"
                             '''
                         }
                     }
