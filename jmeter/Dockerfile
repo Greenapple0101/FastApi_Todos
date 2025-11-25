@@ -1,4 +1,5 @@
-FROM justb4/jmeter:5.6.3
+FROM loadimpact/jmeter:5.6.3
+
 
 ENTRYPOINT [""]
 
