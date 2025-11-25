@@ -1,4 +1,6 @@
-FROM ghcr.io/apache/jmeter:5.6.3
+FROM floodio/jmeter:5.6.2
+WORKDIR /tests
+
 
 
 WORKDIR /tests
