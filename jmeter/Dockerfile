@@ -1,4 +1,4 @@
-FROM --platform=linux/amd64 eclipse-temurin:11-jre
+FROM arm64v8/eclipse-temurin:11-jre
 
 ENV JMETER_VERSION=5.4.1
 ENV JMETER_HOME=/opt/apache-jmeter-${JMETER_VERSION}
@@ -13,3 +13,5 @@ RUN wget https://archive.apache.org/dist/jmeter/binaries/apache-jmeter-${JMETER_
     rm apache-jmeter-${JMETER_VERSION}.tgz
 
 WORKDIR ${JMETER_HOME}
+
+CMD ["jmeter", "-n"]

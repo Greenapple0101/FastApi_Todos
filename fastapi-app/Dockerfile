@@ -10,5 +10,5 @@ RUN pip install --no-cache-dir -r requirements.txt
 # 프로젝트 전체 복사
 COPY . .
 
-# FastAPI 실행 (fastapi-app/app/main.py 안에 app이 존재)
+# FastAPI 실행
 CMD ["uvicorn", "fastapi-app.app.main:app", "--host", "0.0.0.0", "--port", "5001"]
