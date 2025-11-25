@@ -1,5 +1,7 @@
 FROM justb4/jmeter:5.5
 
+ENTRYPOINT [""]
+
 WORKDIR /tests
 
 # Copy the FastAPI load-test plan into the image so it is available at runtime
