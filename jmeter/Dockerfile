@@ -1,4 +1,4 @@
-FROM justb4/jmeter:5.5
+FROM justb4/jmeter:5.4.1
 
 WORKDIR /tests
 
