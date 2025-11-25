@@ -134,19 +134,14 @@ pipeline {
 
         stage('Deploy') {
             steps {
-                script {
-                    sshagent(credentials: ['admin']) {
+                sshagent(['ubuntu']) {
                     sh """
-                    ssh -o StrictHostKeyChecking=no ${REMOTE_USER}@${REMOTE_HOST} << EOF
-                       
-                       # Docker 이미지 다운로드
-                        docker pull yorange50/fastapi-app:latest
-                        docker run -d --name FastApi-app -p 8003:5001 yorange50/fastapi-app:latest
-                        exit
-                        
-                        EOF
+                        ssh -o StrictHostKeyChecking=no ubuntu@3.34.155.126 '
+                            docker pull yorange50/fastapi-app:latest &&
+                            docker rm -f FastApi-app || true &&
+                            docker run -d --name FastApi-app -p 5001:5001 yorange50/fastapi-app:latest
+                        '
                     """
-                    }
                 }
             }
         }
