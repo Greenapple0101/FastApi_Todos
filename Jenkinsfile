@@ -116,7 +116,7 @@ pipeline {
             steps {
                 dir('jmeter') {
                     script {
-                        // Jenkins가 직접 폴더 관리 → 권한 문제 ZERO
+                        // Jenkins가 직접 폴더 관리 → Permission 문제 없음
                         sh """
                             rm -rf report
                             mkdir -p report
@@ -125,11 +125,11 @@ pipeline {
                         docker.image("${JMETER_IMAGE_NAME}:latest").inside('--network host') {
                             sh """
                                 jmeter -n \
-                                  -t ${WORKSPACE}/jmeter/fastapi_test_plan.jmx \
+                                  -t fastapi_test_plan.jmx \
                                   -JBASE_URL=http://3.34.155.126:5001 \
-                                  -l ${WORKSPACE}/jmeter/results.jtl \
+                                  -l results.jtl \
                                   -Jjmeter.save.saveservice.output_format=csv \
-                                  -e -o ${WORKSPACE}/jmeter/report
+                                  -e -o report
                             """
                         }
                     }
