@@ -120,13 +120,7 @@ pipeline {
                             sh """
                                 rm -rf ${WORKSPACE}/jmeter/report
                                 rm -f ${WORKSPACE}/jmeter/results.jtl
-
-                                jmeter -n \
-                                  -t ${WORKSPACE}/jmeter/fastapi_test_plan.jmx \
-                                  -JBASE_URL=http://3.34.155.126:5001 \
-                                  -l ${WORKSPACE}/jmeter/results.jtl \
-                                  -Jjmeter.save.saveservice.output_format=csv \
-                                  -e -o ${WORKSPACE}/jmeter/report
+                                jmeter -n -t ${WORKSPACE}/jmeter/fastapi_test_plan.jmx -JBASE_URL=http://3.34.155.126:5001 -l ${WORKSPACE}/jmeter/results.jtl -Jjmeter.save.saveservice.output_format=csv -e -o ${WORKSPACE}/jmeter/report
                             """
                         }
                     }
