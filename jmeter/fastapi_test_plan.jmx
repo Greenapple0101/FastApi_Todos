@@ -120,7 +120,7 @@
 
               <elementProp name="influxdbUrl" elementType="Argument">
                 <stringProp name="Argument.name">influxdbUrl</stringProp>
-                <stringProp name="Argument.value">http://3.34.155.126:8086/api/v2/write?org=sca&bucket=jmeter_metrics</stringProp>
+                <stringProp name="Argument.value">http://3.34.155.126:8086/api/v2/write?org=sca&amp;bucket=jmeter_metrics</stringProp>
               </elementProp>
 
               <elementProp name="application" elementType="Argument">
