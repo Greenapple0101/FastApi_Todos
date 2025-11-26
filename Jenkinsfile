@@ -117,17 +117,17 @@ pipeline {
                 dir('jmeter') {
                     script {
                         docker.image("${JMETER_IMAGE_NAME}:latest").inside('--network host') {
-                            sh '''
-                                rm -rf /var/lib/jenkins/workspace/Jmeter/jmeter/report
-                                rm -f /var/lib/jenkins/workspace/Jmeter/jmeter/results.jtl
+                            sh """
+                                rm -rf ${WORKSPACE}/jmeter/report
+                                rm -f ${WORKSPACE}/jmeter/results.jtl
 
                                 jmeter -n \
-                                  -t /var/lib/jenkins/workspace/Jmeter/jmeter/fastapi_test_plan.jmx \
+                                  -t ${WORKSPACE}/jmeter/fastapi_test_plan.jmx \
                                   -JBASE_URL=http://3.34.155.126:5001 \
-                                  -l /var/lib/jenkins/workspace/Jmeter/jmeter/results.jtl \
+                                  -l ${WORKSPACE}/jmeter/results.jtl \
                                   -Jjmeter.save.saveservice.output_format=csv \
-                                  -e -o /var/lib/jenkins/workspace/Jmeter/jmeter/report
-                            '''
+                                  -e -o ${WORKSPACE}/jmeter/report
+                            """
                         }
                     }
                 }
@@ -139,8 +139,7 @@ pipeline {
                         reportDir: 'jmeter/report',
                         reportFiles: 'index.html',
                         keepAll: true,
-                        alwaysLinkToLastBuild: true,
-                        allowMissing: false
+                        alwaysLinkToLastBuild: true
                     ])
                 }
             }
