@@ -116,17 +116,17 @@ pipeline {
             steps {
                 dir('jmeter') {
                     script {
-                        docker.image("${JMETER_IMAGE_NAME}:latest").inside('--network host --user root:root') {
+                        docker.image("${JMETER_IMAGE_NAME}:latest").inside('--network host') {
                             sh '''
-                                rm -rf report results.jtl jmeter.log
-                                mkdir -p report
+                                rm -rf /var/lib/jenkins/workspace/Jmeter/jmeter/report
+                                rm -f /var/lib/jenkins/workspace/Jmeter/jmeter/results.jtl
 
                                 jmeter -n \
-                                    -t fastapi_test_plan.jmx \
-                                    -JBASE_URL=http://3.34.155.126:5001 \
-                                    -l results.jtl \
-                                       -Jjmeter.save.saveservice.output_format=csv \
-                                    -e -o report
+                                  -t /var/lib/jenkins/workspace/Jmeter/jmeter/fastapi_test_plan.jmx \
+                                  -JBASE_URL=http://3.34.155.126:5001 \
+                                  -l /var/lib/jenkins/workspace/Jmeter/jmeter/results.jtl \
+                                  -Jjmeter.save.saveservice.output_format=csv \
+                                  -e -o /var/lib/jenkins/workspace/Jmeter/jmeter/report
                             '''
                         }
                     }
