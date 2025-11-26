@@ -116,11 +116,20 @@ pipeline {
             steps {
                 dir('jmeter') {
                     script {
+                        // Jenkins가 직접 폴더 관리 → 권한 문제 ZERO
+                        sh """
+                            rm -rf report
+                            mkdir -p report
+                        """
+
                         docker.image("${JMETER_IMAGE_NAME}:latest").inside('--network host') {
                             sh """
-                                rm -rf ${WORKSPACE}/jmeter/report
-                                rm -f ${WORKSPACE}/jmeter/results.jtl
-                                jmeter -n -t ${WORKSPACE}/jmeter/fastapi_test_plan.jmx -JBASE_URL=http://3.34.155.126:5001 -l ${WORKSPACE}/jmeter/results.jtl -Jjmeter.save.saveservice.output_format=csv -e -o ${WORKSPACE}/jmeter/report
+                                jmeter -n \
+                                  -t ${WORKSPACE}/jmeter/fastapi_test_plan.jmx \
+                                  -JBASE_URL=http://3.34.155.126:5001 \
+                                  -l ${WORKSPACE}/jmeter/results.jtl \
+                                  -Jjmeter.save.saveservice.output_format=csv \
+                                  -e -o ${WORKSPACE}/jmeter/report
                             """
                         }
                     }
