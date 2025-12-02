@@ -1,12 +1,18 @@
+import logging
+import time
+from multiprocessing import Queue
+from os import getenv
 from pathlib import Path
+
 from fastapi import FastAPI, Request
 from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
+from logging_loki import LokiQueueHandler
+from prometheus_fastapi_instrumentator import Instrumentator
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.responses import Response
-from prometheus_fastapi_instrumentator import Instrumentator
 
 from .api.routes import router as todo_router
 
@@ -14,6 +20,20 @@ BASE_DIR = Path(__file__).resolve().parent  # /app/fastapi-app/app
 APP_ROOT = BASE_DIR.parent                  # /app/fastapi-app
 STATIC_DIR = APP_ROOT / "static"
 TEMPLATES_DIR = APP_ROOT / "templates"
+
+
+# Loki logging handler
+loki_logs_handler = LokiQueueHandler(
+    Queue(-1),
+    url=getenv("LOKI_ENDPOINT"),
+    tags={"application": "fastapi"},
+    version="1",
+)
+
+# Custom access logger (ignore Uvicorn's default logging)
+custom_logger = logging.getLogger("custom.access")
+custom_logger.setLevel(logging.INFO)
+custom_logger.addHandler(loki_logs_handler)
 
 
 class SecurityHeadersMiddleware(BaseHTTPMiddleware):
@@ -29,6 +49,20 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
         return response
 
 
+class LoggingMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request: Request, call_next):
+        start_time = time.time()
+        response = await call_next(request)
+        duration = time.time() - start_time  # Compute response time
+        log_message = (
+            f'{request.client.host} - "{request.method} {request.url.path} HTTP/1.1" {response.status_code} {duration:.3f}s'
+        )
+        # Only log if duration exists
+        if duration:
+            custom_logger.info(log_message)
+        return response
+
+
 def create_app() -> FastAPI:
     app = FastAPI(title="FastAPI Todos", version="2.0.0")
 
@@ -41,6 +75,7 @@ def create_app() -> FastAPI:
 
     templates = Jinja2Templates(directory=str(TEMPLATES_DIR))
 
+    app.add_middleware(LoggingMiddleware)
     app.add_middleware(SecurityHeadersMiddleware)
     app.add_middleware(TrustedHostMiddleware, allowed_hosts=["*"])
 
